@@ -70,13 +70,13 @@ class SlackNotification(BaseNotification):
         if self.slack_web_hook:
             res = requests.post(
                 self.slack_web_hook,
-                json=json.loads(message)
+                json=message
             )
             return str(res.text) == "ok"
         elif self.slack_token:
-            response = client.chat_postMessage(
+            response = self.slack_lient.chat_postMessage(
                 channel=self.slack_channel,
-                blocks=json.loads(message)
+                blocks=message
             )
             if response.status_code == 200:
                 return response.data["ts"]
