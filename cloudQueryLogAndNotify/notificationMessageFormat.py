@@ -6,8 +6,7 @@ from .baseClass import BaseSlackFormartMessage
 class DefaultSlackFormatMessage(BaseSlackFormartMessage):
 
     def __init__(self):
-        self.template = '''{
-            "attachments": [
+        self.template = '''{"attachments": [
                 {
                     "blocks": [
                         {
@@ -36,6 +35,9 @@ class DefaultSlackFormatMessage(BaseSlackFormartMessage):
                 }
             ]
         }'''
+
+    def validate(self):
+        return True
 
     def format_message(self, message):
         if self.validate():
