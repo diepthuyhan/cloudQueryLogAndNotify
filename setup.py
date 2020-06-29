@@ -12,7 +12,7 @@ with open("requirements.txt" "r") as f:
 setuptools.setup(
     name="cloudLogQueryAndNotify",
     version="0.0.1",
-    author="diepthuyhan"
+    author="diepthuyhan",
     author_email="diepthuyhan",
     description="Query Log From Cloud Provider and Notify",
     long_description=long_description,
