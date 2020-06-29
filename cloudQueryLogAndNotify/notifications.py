@@ -52,7 +52,7 @@ class BaseNotification:
 class SlackNotification(BaseNotification):
 
     def __init__(self, slack_web_hook=None, slack_token=None, channel=None):
-        supper().__init__()
+        super().__init__()
 
         if not any([slack_token, slack_web_hook]):
             logger.error("Missing slack_web_hook or slack_token")
