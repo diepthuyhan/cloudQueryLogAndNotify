@@ -9,7 +9,7 @@ from .notificationMessageFormat import DefaultSlackFormatMessage
 class BaseNotification:
 
     def __init__(self):
-        self._format_message = None
+        self._format_message_obj = None
         self._validate = []
 
     def add_validate(self, validate_obj):
@@ -26,7 +26,7 @@ class BaseNotification:
 
     def _format_message(self, message):
         if self._format_message:
-            return self._format_message.format_message(message)
+            return self._format_message_obj.format_message(message)
         return json.dumps({"message": message})
 
     def post(self, message):
@@ -63,7 +63,7 @@ class SlackNotification(BaseNotification):
             self.slack_client = slack.WebClient(token=slack_token)
             self.slack_channel = channel
 
-        self._format_message = DefaultSlackFormatMessage()
+        self._format_message_obj = DefaultSlackFormatMessage()
 
 
     def post(self, message):
