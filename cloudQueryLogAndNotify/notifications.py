@@ -72,7 +72,7 @@ class SlackNotification(BaseNotification):
                 self.slack_web_hook,
                 json=json.loads(message)
             )
-            return res.text == "ok"
+            return str(res.text) == "ok"
         elif self.slack_token:
             response = client.chat_postMessage(
                 channel=self.slack_channel,
