@@ -3,7 +3,7 @@ import requests
 import slack
 
 from .settings import logger
-from .logFormat import DefaultSlackFormatMessage
+from .notificationMessageFormat.py import DefaultSlackFormatMessage
 
 
 class BaseNotification:
