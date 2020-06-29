@@ -46,7 +46,7 @@ class BaseNotification:
             except Exception as e:
                 logger.error(f"Cant not send notification {self.__class__.__name__} Error: {e}")
                 res.append(False)
-        return False
+        return res
 
 
 class SlackNotification(BaseNotification):
