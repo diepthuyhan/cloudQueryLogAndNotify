@@ -27,7 +27,7 @@ class BaseNotification:
     def _format_message(self, message):
         if self._format_message:
             return self._format_message_obj.format_message(message)
-        return json.dumps({"message": message})
+        return message
 
     def post(self, message):
         pass
