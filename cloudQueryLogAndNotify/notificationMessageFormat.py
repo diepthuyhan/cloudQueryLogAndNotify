@@ -20,12 +20,12 @@ class DefaultSlackFormatMessage(BaseSlackFormartMessage):
                         "type": "section",
                         "fields": [
                             {
-                                "type": "plain_text",
+                                "type": "mrkdwn",
                                 "text": "*CurrentTime* {nowtime}",
                                 "emoji": True
                             },
                             {
-                                "type": "plain_text",
+                                "type": "mrkdwn",
                                 "text": "*Timezone* {timezone}",
                                 "emoji": True
                             }
