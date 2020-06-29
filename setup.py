@@ -13,7 +13,7 @@ setuptools.setup(
     name="cloudLogQueryAndNotify",
     version="0.0.1",
     author="diepthuyhan"
-    author_email="",
+    author_email="diepthuyhan",
     description="Query Log From Cloud Provider and Notify",
     long_description=long_description,
     long_description_content_type="text/markdown",
