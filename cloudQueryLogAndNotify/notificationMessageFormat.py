@@ -17,17 +17,15 @@ class DefaultSlackFormatMessage(BaseSlackFormartMessage):
                         }
                     },
                     {
-                        "type": "section",
-                        "fields": [
+                        "type": "context",
+                        "elements": [
                             {
                                 "type": "mrkdwn",
                                 "text": "*CurrentTime* {nowtime}",
-                                "emoji": True
                             },
                             {
                                 "type": "mrkdwn",
                                 "text": "*Timezone* {timezone}",
-                                "emoji": True
                             }
                         ]
                     }
@@ -43,7 +41,8 @@ class DefaultSlackFormatMessage(BaseSlackFormartMessage):
             current_time = f'*CurrentTime*: {datetime.now().strftime("%Y-%m-%d:%H:%M")}'
             timezone = f"*Timezone* {time.tzname[0]}"
             self.template["blocks"][0]["text"]["text"] = subject
-            self.template["blocks"][1]["fields"][0]["text"] = current_time
-            self.template["blocks"][1]["fields"][1]["text"] = timezone
+            self.template["blocks"][1]["elements"][0]["text"] = current_time
+            self.template["blocks"][1]["elements"][1]["text"] = timezone
             return self.template
         return None
+
