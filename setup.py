@@ -4,7 +4,7 @@ with open("readme.md", "r") as fh:
     long_description = fh.read()
 
 REQUIRE = []
-with open("requirements.txt" "r") as f:
+with open("requirements.txt", "r") as f:
     requirements = f.readlines()
     REQUIRE = [r.strip() for r in requirements]
 
