@@ -41,7 +41,7 @@ class AWSCloudWatchLogInsightQuery:
         return current_query_id
 
     def get_query_results(self, query_id=None):
-        if query_id not in self.query_result:
+        if query_id not in self.query_results:
             return None
         if self.query_results[query_id]:
             return self.query_results[query_id]
@@ -49,24 +49,28 @@ class AWSCloudWatchLogInsightQuery:
             queryId=query_id
         )
         if query_result["status"] == "Complete":
-            result = {
+            log_results = {
                 "status": query_result["status"],
-                "results": {}
+                "results": []
             }
-            for field in results["results"]:
-                result["results"][field["field"]] = field["value"]
-            self.query_results[query_id] = result
-            return result
+            
+            for log in query_result["results"]:
+                a_log_entry = {}
+                for field in log:
+                    a_log_entry[field["field"]] = field["value"]
+                log_results["results"].append(a_log_entry)
+            self.query_results[query_id] = log_results
+            return log_results
         elif query_result["status"] in ["Failed", "Cancelled"]:
             self.query_results[query_id] = {
                 "status": query_result["status"],
-                "results": {}
+                "results": None
             }
             return self.query_results[query_id]
         else:
             return {
                 "status": query_result["status"],
-                "results": None
+                "results": []
             }
 
     def get_queries_results_block(self, timeout=None):
@@ -83,3 +87,4 @@ class AWSCloudWatchLogInsightQuery:
         for query_id in self.query_results:
             self.get_query_results(query_id)
         return self.query_results
+
