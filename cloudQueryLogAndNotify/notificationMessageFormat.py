@@ -42,8 +42,8 @@ class DefaultSlackFormatMessage(BaseSlackFormartMessage):
             subject = f"*{message}*"
             current_time = datetime.now().strftime("%Y-%m-%d:%H:%M")
             timezone = time.tzname[0]
-            self.template["attachments"][0]["blocks"][0]["text"]["text"] = subject
-            self.template["attachments"][0]["blocks"][1]["fields"][0]["text"] = current_time
-            self.template["attachments"][0]["blocks"][1]["fields"][1]["text"] = timezone
+            self.template["block"][0]["text"]["text"] = subject
+            self.template["block"][1]["fields"][0]["text"] = current_time
+            self.template["block"][1]["fields"][1]["text"] = timezone
             return json.dumps(self.template, indent=4)
         return None
