@@ -41,6 +41,7 @@ class DefaultSlackFormatMessage(BaseSlackFormartMessage):
         return True
 
     def format_message(self, message):
+        thread_ts = message.pop("thread_ts", None)
         if self.validate():
             if isinstance(message, dict):
                 color = message.pop("color", "#ffeeff")
@@ -53,6 +54,9 @@ class DefaultSlackFormatMessage(BaseSlackFormartMessage):
             self.template["attachments"][0]["blocks"][1]["elements"][0]["text"] = current_time
             self.template["attachments"][0]["blocks"][1]["elements"][1]["text"] = timezone
             self.template["attachments"]["0"]["color"] = color
+            if thread_ts:
+                thread_ts
+                self.template["thread_ts"] = thread_ts
             return self.template
         return None
 
