@@ -9,10 +9,10 @@ from .notificationMessageFormat import DefaultSlackFormatMessage
 class BaseNotification:
 
     def __init__(self):
-        self._format_message_obj = None
+        self._format_message_objs = []
         self._validate = []
 
-    def add_validate(self, validate_obj):
+    def add_validator(self, validate_obj):
         self._validate.append(validate_obj)
 
     def _validate_message(self, message):
@@ -21,13 +21,14 @@ class BaseNotification:
                 return False
         return True
 
-    def set_format_message(self, format_message_object):
-        self._format_message = format_message_object
+    def add_formater(self, format_message_object):
+        self._format_message_objs.append(format_message_object)
 
     def _format_message(self, message):
-        if self._format_message:
-            return self._format_message_obj.format_message(message)
-        return message
+        new_message = message
+        for formater in self._format_message_objs:
+            new_message = formater.format_message(message)
+        return new_message
 
     def post(self, message):
         pass
@@ -37,7 +38,8 @@ class BaseNotification:
         for message in messages:
             try:
                 if self._validate_message(message):
-                    post_result = self.post(self._format_message(message))
+                    formarted_message = self._format_message(message)
+                    post_result = self.post(formarted_message)
                     logger.info(f"Send notification {self.__class__.__name__} ok")
                     res.append(post_result)
                 else:
