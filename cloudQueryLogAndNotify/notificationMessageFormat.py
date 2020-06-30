@@ -10,6 +10,7 @@ class DefaultSlackFormatMessage(BaseSlackFormartMessage):
         self.template = {
                 "attachments": [
                     {
+                        "color": "#ffeeff",
                         "blocks": [
                             {
                                 "type": "section",
@@ -42,6 +43,7 @@ class DefaultSlackFormatMessage(BaseSlackFormartMessage):
     def format_message(self, message):
         if self.validate():
             if isinstance(message, dict):
+                color = message.pop("color", "#ffeeff")
                 subject = json.dumps(message)
             else:
                 subject = f"*{str(message)}*"
@@ -50,6 +52,7 @@ class DefaultSlackFormatMessage(BaseSlackFormartMessage):
             self.template["attachments"][0]["blocks"][0]["text"]["text"] = subject
             self.template["attachments"][0]["blocks"][1]["elements"][0]["text"] = current_time
             self.template["attachments"][0]["blocks"][1]["elements"][1]["text"] = timezone
+            self.template["attachments"]["0"]["color"] = color
             return self.template
         return None
 

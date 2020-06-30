@@ -72,6 +72,7 @@ class SlackNotification(BaseNotification):
         self._format_message_obj = DefaultSlackFormatMessage()
 
     def post(self, message):
+        del message["token"]
         if self.slack_web_hook:
             res = self.http_client.post(
                 self.slack_web_hook,
