@@ -44,7 +44,7 @@ class DefaultSlackFormatMessage(BaseSlackFormartMessage):
         if self.validate():
             if isinstance(message, dict):
                 color = message.pop("color", "#ffeeff")
-                subject = json.dumps(message)
+                subject = json.dumps(message, indent=4, ensure_ascii=False)
             else:
                 subject = f"*{str(message)}*"
             current_time = f'*CurrentTime*: {datetime.now().strftime("%Y-%m-%d:%H:%M")}'
