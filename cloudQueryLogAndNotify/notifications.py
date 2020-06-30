@@ -71,7 +71,8 @@ class SlackNotification(BaseNotification):
             }
             self.http_client.headers.update(self._headers)
 
-        self._format_message_obj = DefaultSlackFormatMessage()
+    def _init_format_message(self):
+        self._format_message_obj = [DefaultSlackFormatMessage()]
 
     def post(self, message):
         del message["token"]
