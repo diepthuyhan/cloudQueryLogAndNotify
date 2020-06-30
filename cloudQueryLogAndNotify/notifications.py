@@ -1,6 +1,6 @@
 import json
 import requests
-import slack
+# import slack
 
 from .settings import logger
 from .notificationMessageFormat import DefaultSlackFormatMessage
@@ -53,32 +53,38 @@ class SlackNotification(BaseNotification):
 
     def __init__(self, slack_web_hook=None, slack_token=None, channel=None):
         super().__init__()
+        
+        self.http_client = requests.Session()
 
         if not any([slack_token, slack_web_hook]):
             logger.error("Missing slack_web_hook or slack_token")
             exit(1)
         self.slack_web_hook = slack_web_hook
         self.slack_token = slack_token
+        self.slack_channel = channel
         if slack_token:
-            self.slack_client = slack.WebClient(token=slack_token)
-            self.slack_channel = channel
+            self._headers = {
+                "Authorization": f"Bearer {slack_token}",
+                "User-Agent": "Simple-Slack-Application-Notify-Alarm"
+            }
+            self.http_client.headers.update(self._headers)
 
         self._format_message_obj = DefaultSlackFormatMessage()
 
-
     def post(self, message):
         if self.slack_web_hook:
-            res = requests.post(
+            res = self.http_client.post(
                 self.slack_web_hook,
                 json=message
             )
             return str(res.text) == "ok"
         elif self.slack_token:
-            response = self.slack_lient.chat_postMessage(
-                channel=self.slack_channel,
-                blocks=message
+            response = self.http_client.post(
+                json=message
             )
             if response.status_code == 200:
-                return response.data["ts"]
+                res_json = response.json()
+                if res_json["ok"]:
+                    return res_json["ts"]
             else:
                 return False
