@@ -44,11 +44,14 @@ class DefaultSlackFormatMessage(BaseSlackFormartMessage):
         except KeyError:
             thread_ts = None
         if isinstance(message, dict):
-            try:
-                color = message.pop("color")
-            except KeyError:
-                color = DEFAULT_SLACK_MESSAGE_COLOR
-            subject = f"```\n{json.dumps(message, indent=4, ensure_ascii=False)}\n```"
+            if "text" in message:
+                subject = f"*{str(message['text'])}*"
+            else:
+                try:
+                    color = message.pop("color")
+                except KeyError:
+                    color = DEFAULT_SLACK_MESSAGE_COLOR
+                subject = f"```\n{json.dumps(message, indent=4, ensure_ascii=False)}\n```"
         else:
             subject = f"*{str(message)}*"
         current_time = f'*CurrentTime*: {datetime.now().strftime("%Y-%m-%d:%H:%M")}'
