@@ -6,7 +6,7 @@ with open("readme.md", "r") as fh:
 REQUIRE = []
 with open("requirements.txt", "r") as f:
     requirements = f.readlines()
-    REQUIRE = [r.strip() for r in requirements]
+    REQUIRE = [r.strip() for r in requirements if not r.startwith("#")]
 
 
 setuptools.setup(
