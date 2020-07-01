@@ -10,7 +10,7 @@ with open("requirements.txt", "r") as f:
 
 
 setuptools.setup(
-    name="cloudLogQueryAndNotify",
+    name="cloudQueryLogAndNotify",
     version="0.0.1",
     author="diepthuyhan",
     author_email="diepthuyhan",
