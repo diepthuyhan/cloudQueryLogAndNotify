@@ -13,3 +13,8 @@ from .queryLogInsight import AWSCloudWatchLogInsightQuery
 from .notificationMessageFormat import (
     DefaultSlackFormatMessage
 )
+
+from .baseClass import (
+    BaseSlackFormartMessage,
+    BaseFormatMessage
+)

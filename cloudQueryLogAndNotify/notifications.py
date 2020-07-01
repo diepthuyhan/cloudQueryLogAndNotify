@@ -25,20 +25,23 @@ class BaseNotification:
         self._format_message_objs.append(format_message_object)
 
     def _format_message(self, message):
-        new_message = message
+        new_message = None
         for formater in self._format_message_objs:
             new_message = formater.format_message(message)
-        return new_message
+            return new_message
+        return message
 
     def post(self, message):
         pass
 
-    def notify(self, messages):
+    def notify(self, messages, thread_ts=None):
         res = []
         for message in messages:
             try:
                 if self._validate_message(message):
                     formarted_message = self._format_message(message)
+                    if thread_ts:
+                        formarted_message["thread_ts"] = thread_ts
                     post_result = self.post(formarted_message)
                     logger.info(f"Send notification {self.__class__.__name__} ok")
                     res.append(post_result)
@@ -75,7 +78,11 @@ class SlackNotification(BaseNotification):
         self._format_message_obj = [DefaultSlackFormatMessage()]
 
     def post(self, message):
-        del message["token"]
+        try:
+            del message["token"]
+        except KeyError:
+            pass
+            
         if self.slack_web_hook:
             res = self.http_client.post(
                 self.slack_web_hook,
@@ -84,6 +91,7 @@ class SlackNotification(BaseNotification):
             return str(res.text) == "ok"
         elif self.slack_token:
             response = self.http_client.post(
+                "https://slack.com/api/chat.postMessage",
                 json=message
             )
             if response.status_code == 200:

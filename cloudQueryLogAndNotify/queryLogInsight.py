@@ -26,7 +26,7 @@ class AWSCloudWatchLogInsightQuery:
         self.query_results = {}
 
     def build_query(self, **kwargs):
-        query_str = f"fields @timestamp, @message filter @message like /{kwargs['query_keyword']}/"
+        query_str = f"fields @timestamp, @message | filter @message like /{kwargs['query_keyword']}/"
         return query_str
 
     def start_query(self, query_string, start_timestamp, end_timestamp, limit=None):
