@@ -81,6 +81,9 @@ class SlackNotification(BaseNotification):
         except KeyError:
             pass
             
+        if "text" not in message:
+            message["text"] = "Notification"
+                
         if self.slack_web_hook:
             res = self.http_client.post(
                 self.slack_web_hook,
@@ -94,8 +97,6 @@ class SlackNotification(BaseNotification):
                 return False
         elif self.slack_token:
             message["channel"] = self.slack_channel
-            if "text" not in message:
-                message["text"] = "Notification"
             response = self.http_client.post(
                 "https://slack.com/api/chat.postMessage",
                 json=message
