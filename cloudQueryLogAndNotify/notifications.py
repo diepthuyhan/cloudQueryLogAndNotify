@@ -4,50 +4,47 @@ import requests
 
 from .settings import logger
 from .notificationMessageFormat import DefaultSlackFormatMessage
+from .customExceptions import (
+    IgnoreMessage,
+    MissingArgs
+)
 
 
 class BaseNotification:
 
     def __init__(self):
-        self._format_message_objs = []
-        self._validate = []
-
-    def add_validator(self, validate_obj):
-        self._validate.append(validate_obj)
-
-    def _validate_message(self, message):
-        for validate_obj in self._validate:
-            if not validate_obj.validate(message):
-                return False
-        return True
+        self._format_message_objs = self.init_format_message()
+    
+    def init_format_message(self):
+        return []
 
     def add_formater(self, format_message_object):
         self._format_message_objs.append(format_message_object)
 
     def _format_message(self, message):
-        new_message = None
         for formater in self._format_message_objs:
-            new_message = formater.format_message(message)
-            return new_message
+            try:
+                new_message = formater.format(message)
+                if new_message:
+                    return new_message
+            except IgnoreMessage:
+                continue
         return message
 
     def post(self, message):
-        pass
+        return False
 
     def notify(self, messages, thread_ts=None):
         res = []
+        if not messages:
+            logger.info("Message empty")
         for message in messages:
             try:
-                if self._validate_message(message):
-                    formarted_message = self._format_message(message)
-                    if thread_ts:
-                        formarted_message["thread_ts"] = thread_ts
-                    post_result = self.post(formarted_message)
-                    logger.info(f"Send notification {self.__class__.__name__} ok")
-                    res.append(post_result)
-                else:
-                    logger.info(f"{self.__class__.__name__} message invalid")
-                    res.append(False)
+                formarted_message = self._format_message(message)
+                if thread_ts:
+                    formarted_message["thread_ts"] = thread_ts
+                post_result = self.post(formarted_message)
+                res.append(post_result)
             except Exception as e:
                 logger.error(f"Cant not send notification {self.__class__.__name__} Error: {e}")
                 res.append(False)
@@ -63,7 +60,7 @@ class SlackNotification(BaseNotification):
 
         if not any([slack_token, slack_web_hook]):
             logger.error("Missing slack_web_hook or slack_token")
-            exit(1)
+            raise MissingArgs(f"{self.__class__.__name__} missing slack_web_hook or slack_token")
         self.slack_web_hook = slack_web_hook
         self.slack_token = slack_token
         self.slack_channel = channel
@@ -73,9 +70,10 @@ class SlackNotification(BaseNotification):
                 "User-Agent": "Simple-Slack-Application-Notify-Alarm"
             }
             self.http_client.headers.update(self._headers)
+        
 
-    def _init_format_message(self):
-        self._format_message_obj = [DefaultSlackFormatMessage()]
+    def init_format_message(self):
+        return [DefaultSlackFormatMessage()]
 
     def post(self, message):
         try:
@@ -88,8 +86,16 @@ class SlackNotification(BaseNotification):
                 self.slack_web_hook,
                 json=message
             )
-            return str(res.text) == "ok"
+            if str(res.text) == "ok":
+                logger.info(f"[{self.__class__.__name__}] Send notification success")
+                return True
+            else:
+                logger.error(f"[{self.__class__.__name__}] Send notification fail, Message: {res.text}")
+                return False
         elif self.slack_token:
+            message["channel"] = self.slack_channel
+            if "text" not in message:
+                message["text"] = "Notification"
             response = self.http_client.post(
                 "https://slack.com/api/chat.postMessage",
                 json=message
@@ -97,6 +103,10 @@ class SlackNotification(BaseNotification):
             if response.status_code == 200:
                 res_json = response.json()
                 if res_json["ok"]:
+                    logger.info(f"[{self.__class__.__name__}] Send notification success")
                     return res_json["ts"]
+                else:
+                    logger.error(f"[{self.__class__.__name__}] Send notification fail, Message: {response.text}")
+                    return False
             else:
                 return False

@@ -2,6 +2,7 @@ import time
 import json
 from datetime import datetime
 from .baseClass import BaseSlackFormartMessage
+from .settings import DEFAULT_SLACK_MESSAGE_COLOR
 
 
 class DefaultSlackFormatMessage(BaseSlackFormartMessage):
@@ -10,7 +11,7 @@ class DefaultSlackFormatMessage(BaseSlackFormartMessage):
         self.template = {
                 "attachments": [
                     {
-                        "color": "#ffeeff",
+                        "color": DEFAULT_SLACK_MESSAGE_COLOR,
                         "blocks": [
                             {
                                 "type": "section",
@@ -37,26 +38,26 @@ class DefaultSlackFormatMessage(BaseSlackFormartMessage):
                 ]
             }
 
-    def validate(self):
-        return True
-
     def format_message(self, message):
-        thread_ts = message.pop("thread_ts", None)
-        if self.validate():
-            if isinstance(message, dict):
-                color = message.pop("color", "#ffeeff")
-                subject = json.dumps(message, indent=4, ensure_ascii=False)
-            else:
-                subject = f"*{str(message)}*"
-            current_time = f'*CurrentTime*: {datetime.now().strftime("%Y-%m-%d:%H:%M")}'
-            timezone = f"*Timezone* {time.tzname[0]}"
-            self.template["attachments"][0]["blocks"][0]["text"]["text"] = subject
-            self.template["attachments"][0]["blocks"][1]["elements"][0]["text"] = current_time
-            self.template["attachments"][0]["blocks"][1]["elements"][1]["text"] = timezone
-            self.template["attachments"]["0"]["color"] = color
-            if thread_ts:
-                thread_ts
-                self.template["thread_ts"] = thread_ts
-            return self.template
-        return None
+        try:
+            thread_ts = message.pop("thread_ts")
+        except KeyError:
+            thread_ts = None
+        if isinstance(message, dict):
+            try:
+                color = message.pop("color")
+            except KeyError:
+                color = DEFAULT_SLACK_MESSAGE_COLOR
+            subject = f"```\n{json.dumps(message, indent=4, ensure_ascii=False)}\n```"
+        else:
+            subject = f"*{str(message)}*"
+        current_time = f'*CurrentTime*: {datetime.now().strftime("%Y-%m-%d:%H:%M")}'
+        timezone = f"*Timezone* {time.tzname[0]}"
+        self.template["attachments"][0]["blocks"][0]["text"]["text"] = subject
+        self.template["attachments"][0]["blocks"][1]["elements"][0]["text"] = current_time
+        self.template["attachments"][0]["blocks"][1]["elements"][1]["text"] = timezone
+        self.template["attachments"][0]["color"] = color
+        if thread_ts:
+            self.template["thread_ts"] = thread_ts
+        return self.template
 
